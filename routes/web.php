@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use Hak\MyanmarPaymentUnion\PaymentGateway;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,12 +18,29 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+    $gateway = new PaymentGateway(env('MERCHANT_ID'), env('SECRET_KEY'), env('SANDBOX_MODE'));
+
+    $csrf_token = csrf_token();
+
+    $payment = $gateway->create([
+        'currencyCode' => 'MMK',
+        'amount' => 1000,
+        'invoiceNo' => random_int(11111111, 99999999),
+        'description' => 'test payment description',
+        'frontendReturnUrl' => 'https://ecommerce.test/payments/success'
     ]);
+
+    return redirect()->away($payment->url)->with('csrf_token', csrf_token());
+});
+
+Route::get('/payments/success', function(){
+    $gateway = new PaymentGateway(env('MERCHANT_ID'), env('SECRET_KEY'), env('SANDBOX_MODE'));
+
+    $inquiry = $gateway->inquiry([
+        'invoiceNo' => '72691033'
+    ]);
+
+    return $inquiry->parameters;
 });
 
 Route::get('/dashboard', function () {
