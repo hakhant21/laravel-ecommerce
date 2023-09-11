@@ -27,17 +27,17 @@ Route::get('/', function () {
         'amount' => 1000,
         'invoiceNo' => random_int(11111111, 99999999),
         'description' => 'test payment description',
-        'frontendReturnUrl' => 'https://ecommerce.test/payments/success'
+        'frontendReturnUrl' => 'https://ecommerce.test/success'
     ]);
 
     return redirect()->away($payment->url)->with('csrf_token', csrf_token());
 });
 
-Route::get('/payments/success', function(){
+Route::get('/success', function(){
     $gateway = new PaymentGateway(env('MERCHANT_ID'), env('SECRET_KEY'), env('SANDBOX_MODE'));
 
     $inquiry = $gateway->inquiry([
-        'invoiceNo' => '72691033'
+        'invoiceNo' => '47723319'
     ]);
 
     return $inquiry->parameters;
