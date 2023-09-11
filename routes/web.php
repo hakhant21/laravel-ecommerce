@@ -5,6 +5,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+
+Route::get('/', function(){
+    return Inertia::render('Welcome');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -16,5 +21,10 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-require __DIR__.'/admin/category/web.php';
-require __DIR__.'/admin/product/web.php';
+
+Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
+    require __DIR__.'/admin/category/web.php';
+    require __DIR__.'/admin/product/web.php';
+});
+
+
