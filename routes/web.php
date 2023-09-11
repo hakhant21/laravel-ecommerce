@@ -1,47 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Hak\MyanmarPaymentUnion\PaymentGateway;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::get('/', function () {
-    $gateway = new PaymentGateway(env('MERCHANT_ID'), env('SECRET_KEY'), env('SANDBOX_MODE'));
-
-    $csrf_token = csrf_token();
-
-    $payment = $gateway->create([
-        'currencyCode' => 'MMK',
-        'amount' => 1000,
-        'invoiceNo' => random_int(11111111, 99999999),
-        'description' => 'test payment description',
-        'frontendReturnUrl' => 'https://ecommerce.test/success'
-    ]);
-
-    return redirect()->away($payment->url)->with('csrf_token', csrf_token());
-});
-
-Route::get('/success', function(){
-    $gateway = new PaymentGateway(env('MERCHANT_ID'), env('SECRET_KEY'), env('SANDBOX_MODE'));
-
-    $inquiry = $gateway->inquiry([
-        'invoiceNo' => '47723319'
-    ]);
-
-    return $inquiry->parameters;
-});
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
